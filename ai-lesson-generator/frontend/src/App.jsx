@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   BookOpen, Play, Pause, SkipBack, SkipForward, Volume2, Sparkles,
-  Clock3, ExternalLink, GraduationCap, LoaderCircle, AlertCircle
+  Clock3, ExternalLink, GraduationCap, LoaderCircle, AlertCircle, Download, Upload, Bot
 } from 'lucide-react';
 
 const API_URL = '/api/lessons/generate';
@@ -18,6 +18,7 @@ export default function App() {
   const [rate, setRate] = useState(1);
   const [speaking, setSpeaking] = useState(false);
   const [paused, setPaused] = useState(false);
+  const fileInputRef = useRef(null);
 
   const sections = lesson?.sections ?? [];
   const activeSection = sections[activeIndex];
@@ -117,6 +118,51 @@ export default function App() {
     }
   }
 
+  function saveLesson() {
+    if (!lesson) return;
+    const fileContent = JSON.stringify(lesson, null, 2);
+    const blob = new Blob([fileContent], { type: 'application/json' });
+    const downloadUrl = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    const safeName = (lesson.title || lesson.topic || 'lesson')
+      .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    link.href = downloadUrl;
+    link.download = `${safeName || 'lesson'}.json`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
+  }
+
+  async function loadLessonFile(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+      const valid = data && typeof data.title === 'string'
+        && typeof data.topic === 'string' && typeof data.introduction === 'string'
+        && Array.isArray(data.sections) && data.sections.length >= 1
+        && data.sections.every((section) => typeof section.heading === 'string'
+          && typeof section.narration === 'string'
+          && section.slide && typeof section.slide.title === 'string'
+          && Array.isArray(section.slide.bullet_points));
+      if (!valid) throw new Error('This file is not a valid LessonForge lesson.');
+      window.speechSynthesis?.cancel?.();
+      setSpeaking(false);
+      setPaused(false);
+      setLesson(data);
+      setActiveIndex(0);
+      setError('');
+    } catch (err) {
+      setError(err instanceof SyntaxError
+        ? 'The selected file is not valid JSON.'
+        : (err.message || 'Could not load this lesson file.'));
+    } finally {
+      event.target.value = '';
+    }
+  }
+
   function changeSection(next) {
     if (next < 0 || next >= sections.length) return;
     window.speechSynthesis?.cancel?.();
@@ -132,7 +178,12 @@ export default function App() {
           <span className="brand-mark"><GraduationCap size={22} /></span>
           <span>Lesson<span className="brand-accent">Forge</span></span>
         </a>
-        <div className="topbar-note"><span className="status-dot" /> AI-powered learning studio</div>
+        <div className="topbar-actions">
+          <input ref={fileInputRef} className="file-input-hidden" type="file" accept=".json,application/json" onChange={loadLessonFile} />
+          <button className="topbar-action" onClick={() => fileInputRef.current?.click()}><Upload size={15} /> Load lesson</button>
+          {lesson && <button className="topbar-action save-action" onClick={saveLesson}><Download size={15} /> Save lesson</button>}
+          <div className="topbar-note"><span className="status-dot" /> AI-powered learning studio</div>
+        </div>
       </header>
 
       <main className="main-wrap">
@@ -198,6 +249,17 @@ export default function App() {
                     </div>
 
                     <div className="narration-card">
+                      <div className={`avatar-stage ${speaking && !paused ? 'avatar-speaking' : ''} ${paused ? 'avatar-paused' : ''}`}>
+                        <div className="avatar-glow" />
+                        <div className="avatar-robot">
+                          <div className="avatar-antenna" />
+                          <div className="avatar-face">
+                            <span className="avatar-eye" /><span className="avatar-eye" />
+                            <span className="avatar-mouth" />
+                          </div>
+                        </div>
+                        <div className="avatar-caption"><Bot size={13} /> {speaking && !paused ? 'Your AI tutor is speaking' : paused ? 'Your AI tutor is paused' : 'Your AI tutor is ready'}</div>
+                      </div>
                       <div className="narration-title"><Volume2 size={17} /> LESSON NARRATION</div>
                       <p className="transcript">{activeSection.narration}</p>
                       <div className="audio-controls">

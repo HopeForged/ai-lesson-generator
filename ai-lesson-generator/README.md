@@ -1,89 +1,91 @@
-# AI Lesson Generator — Stage 1
+# AI Lesson Generator
 
-Stage 1 provides the backend foundation: FastAPI, Tavily web research, Gemini lesson generation, JSON validation and automated tests. The React lesson player and avatar are planned for later stages.
+AI Lesson Generator researches a topic and creates a structured lesson with sections, presentation slides, narration, source links and a simple animated AI tutor.
 
 ## Requirements
 
 - Python 3.10 or newer
-- A Gemini API key
-- A Tavily API key
-- Internet access when generating a real lesson
+- Node.js 18 or newer
+- Gemini API key
+- Tavily API key
+- Internet access when generating a new lesson
 
-## Setup (Windows)
+## 1. Configure the backend (first time only)
 
-**Quick start:** open the `backend` folder, double-click `start_backend.bat`, then add your API keys to the `.env` file when prompted. Double-click the same file again to start the server.
+Open a terminal in `backend` and run:
 
-**Manual setup (PowerShell):**
-
-1. Open a terminal in the `backend` folder.
-2. Create and activate a virtual environment:
-
-   ```powershell
-   py -m venv .venv
-   .\.venv\Scripts\Activate.ps1
-   ```
-
-3. Install packages:
-
-   ```powershell
-   pip install -r requirements.txt
-   ```
-
-4. Copy `.env.example` to `.env` and enter your keys:
-
-   ```powershell
-   Copy-Item .env.example .env
-   ```
-
-   Keep `.env` private. It is excluded from Git by `.gitignore`.
-
-5. Start the API:
-
-   ```powershell
-   uvicorn app.main:app --reload
-   ```
-
-6. Open the interactive API page at http://127.0.0.1:8000/docs. The health check is at http://127.0.0.1:8000/health.
-
-## Generate a lesson
-
-In `/docs`, open `POST /api/lessons/generate`, select **Try it out**, and send:
-
-```json
-{
-  "topic": "How computer networks work",
-  "script": "Optional lecturer script or outline goes here."
-}
+```powershell
+py -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+Copy-Item .env.example .env
 ```
 
-The script field is optional. A successful response contains a title, topic, introduction, at least four lesson sections, slide bullet points and source links.
+Open `backend/.env` and enter your own Gemini and Tavily API keys. Never upload `.env` to GitHub.
 
-## Run automated tests
+## 2. Start the backend
 
-From the `backend` folder, double-click `run_tests.bat`, or with the virtual environment activated run:
+In a terminal inside `backend` (with the virtual environment active):
+
+```powershell
+uvicorn app.main:app --reload
+```
+
+The API runs at `http://127.0.0.1:8000`. Check `http://127.0.0.1:8000/health`.
+
+## 3. Start the frontend
+
+Open a second terminal in `frontend`:
+
+```powershell
+npm install
+npm run dev
+```
+
+Open the local address printed by Vite, normally `http://localhost:5173`. Keep both terminals running while using the application.
+
+## Features
+
+- Researches topics with Tavily and generates lessons with Gemini.
+- Accepts an optional lecturer script or outline.
+- Produces structured sections, narration, slide bullet points and sources.
+- Browser text-to-speech with play, pause, previous/next, voice and speed controls.
+- Animated on-screen AI tutor that reacts while narration is playing.
+- Saves a lesson as a JSON file.
+- Loads a saved JSON lesson without calling Gemini or Tavily.
+- Displays useful errors for missing API keys, research/network failures and generation problems.
+
+## Save and load
+
+Use **Save lesson** in the lesson view to download a `.json` lesson file. Use **Load lesson** in the top bar to open that file later. Loading a saved lesson is local and does not make an AI request.
+
+## Automated tests
+
+From the `backend` folder, run:
+
+```powershell
+.\run_tests.bat
+```
+
+Or, with the virtual environment active:
 
 ```powershell
 pytest
 ```
 
-The tests use sample data and do not call Gemini or Tavily. They test lesson validation and JSON parsing.
+The tests use sample data and do not require live Gemini or Tavily calls.
 
 ## API endpoints
 
-- `GET /health` — confirms that the API is running.
-- `POST /api/lessons/generate` — researches the topic with Tavily and generates a validated lesson with Gemini.
+- `GET /health` — backend health check.
+- `POST /api/lessons/generate` — research and generate a lesson.
 
-## Stage 1 commit
+## Git and security
 
-After you have run and checked the project, commit it to your own repository:
+- Keep API keys in `backend/.env`; `.env` is ignored by Git.
+- Do not commit virtual environments, `node_modules`, or API keys.
+- Use meaningful commits when completing project stages.
 
-```bash
-git add .
-git commit -m "Initial working backend with AI lesson generation"
-git branch -M main
-git push -u origin main
-```
+## AI assistance
 
-## AI assistance and academic integrity
-
-AI assistance was used to create the initial Stage 1 scaffold. Review, run, test and understand the code; adapt it yourself and disclose this assistance in the AI-use log required by the project brief. Do not submit code you cannot explain.
+AI assistance was used during development. Review and understand the code, verify its behaviour, and disclose AI assistance in the AI-use log required by the project brief. Do not submit code you cannot explain.
