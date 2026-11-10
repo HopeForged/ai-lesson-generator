@@ -3,7 +3,7 @@ import os
 import re
 from typing import Any
 
-from app.models import Lesson
+from app.models import Lesson, VisualMoment, VisualScene
 
 
 class ConfigurationError(Exception):
@@ -62,6 +62,61 @@ def _extract_json(raw_text: str) -> str:
     return text[start : end + 1]
 
 
+def _fallback_visual_moments(section) -> list[VisualMoment]:
+    """Create sentence-linked visual beats if Gemini omits usable scene cues."""
+    narration = section.narration.strip()
+    sentences = [part.strip() for part in re.split(r"(?<=[.!?])\s+", narration) if part.strip()]
+
+    if len(sentences) < 3:
+        words = narration.split()
+        chunk_size = max(1, (len(words) + 2) // 3)
+        sentences = [" ".join(words[index:index + chunk_size]) for index in range(0, len(words), chunk_size)]
+        if len(sentences) > 1 and len(sentences[-1]) < 5:
+            sentences[-2] = f"{sentences[-2]} {sentences[-1]}".strip()
+            sentences.pop()
+
+    selected = sentences[:4]
+    points = section.slide.bullet_points or [section.slide.title, section.heading]
+    moments: list[VisualMoment] = []
+    for index, cue in enumerate(selected):
+        primary = points[index % len(points)]
+        secondary = points[(index + 1) % len(points)] if len(points) > 1 else section.heading
+        lowered = cue.lower()
+        if any(word in lowered for word in ("first", "next", "then", "step", "process", "stage")):
+            scene_type = "process"
+        elif any(word in lowered for word in ("compare", "whereas", "difference", "unlike")):
+            scene_type = "comparison"
+        elif any(word in lowered for word in ("application", "healthcare", "education", "transport", "used in")):
+            scene_type = "applications"
+        else:
+            scene_type = "concept"
+        moments.append(VisualMoment(
+            cue_text=cue[:280],
+            scene=VisualScene(
+                scene_type=scene_type,
+                title=primary[:90],
+                description=cue[:180],
+                items=[primary[:70], secondary[:70]],
+            ),
+        ))
+    return moments[:5]
+
+
+def ensure_visual_moments(lesson: Lesson) -> Lesson:
+    """Ensure every section has multiple visuals tied to spoken text."""
+    for section in lesson.sections:
+        narration_lower = section.narration.lower()
+        usable = [
+            moment for moment in section.visual_moments
+            if moment.cue_text.strip().lower() in narration_lower
+        ]
+        if len(usable) >= 3:
+            section.visual_moments = usable[:5]
+        else:
+            section.visual_moments = _fallback_visual_moments(section)
+    return lesson
+
+
 def generate_lesson(topic: str, script: str | None, research: list[dict[str, str]]) -> Lesson:
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
@@ -69,9 +124,16 @@ def generate_lesson(topic: str, script: str | None, research: list[dict[str, str
 
     prompt = f"""Create a clear educational lesson for the topic: {topic!r}.
 Return ONLY valid JSON matching this structure:
-{{"title":"...","topic":"...","introduction":"...","sections":[{{"heading":"...","narration":"Speaking-friendly explanation, at least 20 characters.","slide":{{"title":"...","bullet_points":["...","..."]}}}}],"sources":[{{"title":"...","url":"https://..."}}]}}
+{{"title":"...","topic":"...","introduction":"...","sections":[{{"heading":"...","narration":"Speaking-friendly explanation, at least 20 characters.","slide":{{"title":"...","bullet_points":["...","..."]}},"visual_scene":{{"scene_type":"concept|process|comparison|timeline|applications|network|generic","title":"Short scene title","description":"One short sentence describing the visual explanation","items":["Short visual label 1","Short visual label 2"]}},"visual_moments":[{{"cue_text":"An exact sentence copied from the narration","scene":{{"scene_type":"concept|process|comparison|timeline|applications|network|generic","title":"Scene title","description":"What this moment should demonstrate","items":["Visual element 1","Visual element 2","Visual element 3"]}}}}]}}],"sources":[{{"title":"...","url":"https://..."}}]}}
 Requirements:
 - Include 4 to 6 sections, each with a heading, narration, slide title and 2 to 6 bullet points.
+- For EVERY section, create 3 to 5 visual_moments. These are separate visual scenes that change DURING the narration, not one static slide for the whole section.
+- Each visual_moment must have cue_text copied EXACTLY as a complete sentence from that section's narration. Do not paraphrase the cue. The cues must appear in the same order as the narration and must not overlap.
+- Give every visual_moment its own scene with a suitable scene_type, short title, one-sentence description and 2 to 5 concise visual labels.
+- Make the scenes visibly different and progressively explain the lesson: introduce the idea, demonstrate a mechanism or steps, then show an example, result or application where appropriate.
+- Choose scene_type: concept for one main idea, process for ordered steps, comparison for differences, timeline for events over time, applications for real-world uses, network for connected parts, or generic when none fit.
+- The visual_moments must match the exact narration passage they are linked to. Do not repeat the same scene or generic labels throughout a section.
+- Also provide visual_scene as a fallback summary scene for older players.
 - Use the research material below for current facts. Do not invent sources.
 - Narration must sound natural when read aloud. Avoid raw URLs and awkward symbols.
 - If a lecturer script is supplied, preserve its ideas and order as the lesson backbone; check and enrich it using research rather than replacing it.
@@ -98,7 +160,8 @@ Web research:
         )
         raw_text = response.text or ""
         payload: Any = json.loads(_extract_json(raw_text))
-        return Lesson.model_validate(payload)
+        lesson = Lesson.model_validate(payload)
+        return ensure_visual_moments(lesson)
     except (json.JSONDecodeError, ValueError) as exc:
         raise GenerationError("Gemini returned a lesson with invalid JSON or missing required fields. Try again.") from exc
     except GenerationError:

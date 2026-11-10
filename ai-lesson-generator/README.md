@@ -1,6 +1,6 @@
 # AI Lesson Generator
 
-AI Lesson Generator researches a topic and creates a structured lesson with sections, presentation slides, narration, source links and a simple animated AI tutor.
+AI Lesson Generator researches a topic and creates a structured lesson with sections, presentation slides, a teaching script, AI-planned visual scenes, source links and an animated AI tutor.
 
 ## Requirements
 
@@ -48,16 +48,18 @@ Open the local address printed by Vite, normally `http://localhost:5173`. Keep b
 
 - Researches topics with Tavily and generates lessons with Gemini.
 - Accepts an optional lecturer script or outline.
-- Produces structured sections, narration, slide bullet points and sources.
-- Browser text-to-speech with play, pause, previous/next, voice and speed controls.
-- Animated on-screen AI tutor that reacts while narration is playing.
+- Produces structured sections, a teaching script, slide bullet points, AI-planned visual scenes and sources.
+- Gemini selects a visual scene type for each section (concept, process, comparison, timeline, applications or network) and supplies short labels and a description.
+- React renders those instructions as animated diagrams and visual layouts using CSS and SVG-style interface elements; no local video-generation GPU is required.
+- Animated on-screen tutor gestures while the lesson is being presented.
+- Browser text-to-speech remains available as an optional accessibility aid, with play, pause, previous/next, voice and speed controls. When supported by the browser, the current spoken word is highlighted in the script.
 - Saves a lesson as a JSON file.
 - Loads a saved JSON lesson without calling Gemini or Tavily.
 - Displays useful errors for missing API keys, research/network failures and generation problems.
 
 ## Save and load
 
-Use **Save lesson** in the lesson view to download a `.json` lesson file. Use **Load lesson** in the top bar to open that file later. Loading a saved lesson is local and does not make an AI request.
+Use **Save lesson** in the lesson view to download a `.json` lesson file. Use **Load lesson** in the top bar to open that file later. Loading a saved lesson is local and does not make an AI request. Older saved lesson files without visual-scene instructions remain supported and display a generic visual scene.
 
 ## Automated tests
 
@@ -78,7 +80,7 @@ The tests use sample data and do not require live Gemini or Tavily calls.
 ## API endpoints
 
 - `GET /health` — backend health check.
-- `POST /api/lessons/generate` — research and generate a lesson.
+- `POST /api/lessons/generate` — research and generate a lesson, including visual-scene instructions for every section.
 
 ## Git and security
 

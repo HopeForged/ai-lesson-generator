@@ -1,0 +1,37 @@
+STAGE 5 - NARRATION-SYNCHRONISED VISUAL SCENES
+
+WHAT THIS UPDATE DOES
+- Gemini plans 3 to 5 visual moments for each lesson section.
+- Each moment is linked to an exact sentence in the narration.
+- The player changes the visual scene as the browser reads those sentences.
+- The current scene and scene progress are shown on screen.
+- A timed fallback is included for browsers that do not emit speech word-boundary events.
+- Older saved lesson JSON files remain compatible; the player creates fallback visual moments for them.
+- The fixed avatar animation is included as well.
+
+INSTALL
+1. Make a backup copy of your current project folder.
+2. Extract this ZIP.
+3. Copy the contents of the ai-lesson-generator folder into your existing project folder.
+4. Allow these files to be replaced.
+5. Do NOT replace or delete your .env, .git, .venv, node_modules, or other local settings.
+
+TEST
+Backend terminal:
+  cd backend
+  .\run_tests.bat
+
+Then restart the backend using your existing start_backend.bat.
+Restart the frontend using:
+  cd frontend
+  npm run dev
+
+TEST THE VISUAL CHANGES
+1. Generate a NEW lesson (new lessons contain AI visual moments).
+2. Use a topic with a process or explanation, e.g. How the Human Heart Works.
+3. Press Play.
+4. Watch the scene counter and visual diagram change as the narration progresses.
+5. Pause and resume; the current scene should remain in place and continue from there.
+
+NOTE
+Older saved lessons do not contain AI-created visual moments. The frontend creates simple fallback moments for them. Generate a new lesson to test Gemini's new visual-planning instructions.

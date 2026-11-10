@@ -2,8 +2,8 @@ import json
 import pytest
 from pydantic import ValidationError
 
-from app.models import Lesson, LessonRequest
-from app.services import GenerationError, _extract_json
+from app.models import Lesson, LessonRequest, VisualMoment, VisualScene
+from app.services import GenerationError, _extract_json, ensure_visual_moments
 
 
 def valid_lesson_dict():
@@ -77,3 +77,47 @@ def test_json_extractor_handles_markdown_code_fence():
 def test_json_extractor_rejects_non_json_reply():
     with pytest.raises(GenerationError):
         _extract_json("I cannot create a lesson right now.")
+
+
+def test_visual_scene_accepts_ai_planned_process():
+    scene = VisualScene.model_validate({
+        "scene_type": "process",
+        "title": "How data moves",
+        "description": "Data passes through three stages.",
+        "items": ["Input", "Processing", "Output"],
+    })
+    assert scene.scene_type == "process"
+    assert len(scene.items) == 3
+
+
+def test_old_lesson_without_visual_scene_remains_compatible():
+    data = valid_lesson_dict()
+    lesson = Lesson.model_validate(data)
+    assert lesson.sections[0].visual_scene.scene_type == "generic"
+    assert len(lesson.sections[0].visual_scene.items) >= 2
+
+
+def test_visual_moment_requires_a_narration_cue_and_scene():
+    moment = VisualMoment.model_validate({
+        "cue_text": "The heart pumps blood around the body.",
+        "scene": {
+            "scene_type": "process",
+            "title": "Blood circulation",
+            "description": "Show blood moving through the body.",
+            "items": ["Heart", "Arteries", "Body"],
+        },
+    })
+    assert moment.scene.scene_type == "process"
+
+
+def test_legacy_lesson_defaults_to_no_visual_moments():
+    lesson = Lesson.model_validate(valid_lesson_dict())
+    assert lesson.sections[0].visual_moments == []
+
+
+def test_ensure_visual_moments_creates_multiple_sentence_linked_scenes():
+    lesson = Lesson.model_validate(valid_lesson_dict())
+    lesson = ensure_visual_moments(lesson)
+    section = lesson.sections[0]
+    assert len(section.visual_moments) >= 3
+    assert all(moment.cue_text in section.narration for moment in section.visual_moments)
