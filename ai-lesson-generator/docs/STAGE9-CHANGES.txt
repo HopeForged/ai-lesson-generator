@@ -1,0 +1,11 @@
+STAGE 9 CHANGES
+
+Frontend
+- TutorAvatar.jsx: new human-style lecturer illustration and teaching gestures.
+- VisualScene.jsx: new scene-specific photosynthesis visuals and connected animated diagrams for other topics.
+- styles.css: human presenter, diagram, particle and photosynthesis animation styling.
+
+Backend
+- app/services.py: stronger lesson-generation instructions for natural lecturer narration, explicit references to illustrations, distinct section visuals, and QA checks for teaching quality.
+
+No API keys or .env files are included.

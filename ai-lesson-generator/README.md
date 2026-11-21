@@ -1,93 +1,63 @@
-# AI Lesson Generator
+# LessonForge – AI lesson generator (stage 11)
 
-AI Lesson Generator researches a topic and creates a structured lesson with sections, presentation slides, a teaching script, AI-planned visual scenes, source links and an animated AI tutor.
+Type a topic (or upload a PDF / Word / text file) and get a **lecture taught by a human lecturer** with a natural voice, diagrams that build as they speak, quizzes, flashcards, a live "ask the lecturer" chat, study notes and an **exportable MP4 video**. Everything below is free to run: Groq + Gemini + Tavily (your existing keys), Edge neural voices, SQLite, Playwright and ffmpeg.
 
-## Requirements
+## What you get
+| Feature | How it works |
+|---|---|
+| Lecturer | 3 selectable lecturers (Dr. Mensah, Prof. Naledi, Mr. Walker) with matching voices; gestures, blinking, lip-sync to the real audio |
+| Natural voice | `edge-tts` (free Microsoft neural voices, 14 languages incl. Zulu, Swahili, Afrikaans). Falls back to the browser voice automatically |
+| Diagrams | 7 layouts (steps, cycle, hub, network, comparison, timeline, grid), a new set per lecture beat, each label lights up when the lecturer says it |
+| Ask the lecturer | Type or speak a question; the lecturer answers at the board with a new diagram |
+| Quizzes | 3 questions per section, a final test, flashcards, saved scores and progress |
+| Library | Every lesson is stored in SQLite, shareable link `#/lesson/<id>` |
+| Teach from your files | PDF, Word (.docx), .txt, .md |
+| Languages & levels | 14 languages; beginner / intermediate / advanced / exam prep |
+| Exports | MP4 lecture video (+ .srt captions), print / save study notes as PDF, Markdown notes, lesson JSON |
+| Live progress | Background jobs with a progress bar while the lesson is built |
+| Safety | per-IP rate limit, upload size limit, Docker image |
 
-- Python 3.10 or newer
-- Node.js 18 or newer
-- Gemini API key
-- Tavily API key
-- Internet access when generating a new lesson
-
-## 1. Configure the backend (first time only)
-
-Open a terminal in `backend` and run:
-
-```powershell
-py -m venv .venv
-.\.venv\Scripts\Activate.ps1
+## Run it (Windows / Mac / Linux)
+```bash
+# backend
+cd backend
+python -m venv .venv && .venv\Scripts\activate        # Mac/Linux: source .venv/bin/activate
 pip install -r requirements.txt
-Copy-Item .env.example .env
-```
-
-Open `backend/.env` and enter your own Gemini and Tavily API keys. Never upload `.env` to GitHub.
-
-## 2. Start the backend
-
-In a terminal inside `backend` (with the virtual environment active):
-
-```powershell
+copy .env.example .env                                  # then paste your keys
 uvicorn app.main:app --reload
-```
 
-The API runs at `http://127.0.0.1:8000`. Check `http://127.0.0.1:8000/health`.
-
-## 3. Start the frontend
-
-Open a second terminal in `frontend`:
-
-```powershell
+# frontend (second terminal)
+cd frontend
 npm install
-npm run dev
+npm run dev                                             # open http://localhost:5173
+```
+The app works with just the keys. The extras switch on when installed (the app tells you what is missing):
+
+1. **Natural voice**: `pip install edge-tts` (already in requirements.txt). Needs internet, no key.
+2. **PDF / Word upload**: `pypdf`, `python-docx` (in requirements.txt).
+3. **Video export**: `playwright install chromium` and install **ffmpeg** (`winget install ffmpeg`, `brew install ffmpeg` or `apt install ffmpeg`). Keep `npm run dev` running: the recorder opens the app at `RENDER_BASE_URL` (default http://127.0.0.1:5173).
+
+### Video export notes
+- The lecture is recorded in real time by a headless browser (about 1.2x the lecture length), then encoded to MP4 with the voice track. You can keep using the app meanwhile.
+- No voice engine? You can still make a captions-only video (tick the box in the video panel).
+
+### Docker (one command, includes ffmpeg and Chromium)
+```bash
+docker compose up --build        # http://localhost:8000
 ```
 
-Open the local address printed by Vite, normally `http://localhost:5173`. Keep both terminals running while using the application.
+## Honest limits
+- Voices need an internet connection (free Microsoft service; they could change it someday). The browser voice is the automatic fallback.
+- There are no user accounts: the library is shared by everyone who can reach the server and progress/scores are saved per browser. Add authentication before putting it on the public internet.
+- The library and quiz endpoints work on lessons saved on the server; links only work for people who can reach your server.
+- Video is recorded in real time, so very long lectures take a while.
+- Quality of facts depends on the AI models; the built-in quality check helps but does not replace reading the sources.
 
-## Features
+## Tests
+`cd backend && python -m pytest -q` (47 tests, no network or API keys needed).
 
-- Researches topics with Tavily and generates lessons with Gemini.
-- Accepts an optional lecturer script or outline.
-- Produces structured sections, a teaching script, slide bullet points, AI-planned visual scenes and sources.
-- Gemini selects a visual scene type for each section (concept, process, comparison, timeline, applications or network) and supplies short labels and a description.
-- React renders those instructions as animated diagrams and visual layouts using CSS and SVG-style interface elements; no local video-generation GPU is required.
-- Animated on-screen tutor gestures while the lesson is being presented.
-- Browser text-to-speech remains available as an optional accessibility aid, with play, pause, previous/next, voice and speed controls. When supported by the browser, the current spoken word is highlighted in the script.
-- Saves a lesson as a JSON file.
-- Loads a saved JSON lesson without calling Gemini or Tavily.
-- Displays useful errors for missing API keys, research/network failures and generation problems.
+Older install notes are in `docs/`.
 
-## Save and load
 
-Use **Save lesson** in the lesson view to download a `.json` lesson file. Use **Load lesson** in the top bar to open that file later. Loading a saved lesson is local and does not make an AI request. Older saved lesson files without visual-scene instructions remain supported and display a generic visual scene.
-
-## Automated tests
-
-From the `backend` folder, run:
-
-```powershell
-.\run_tests.bat
-```
-
-Or, with the virtual environment active:
-
-```powershell
-pytest
-```
-
-The tests use sample data and do not require live Gemini or Tavily calls.
-
-## API endpoints
-
-- `GET /health` — backend health check.
-- `POST /api/lessons/generate` — research and generate a lesson, including visual-scene instructions for every section.
-
-## Git and security
-
-- Keep API keys in `backend/.env`; `.env` is ignored by Git.
-- Do not commit virtual environments, `node_modules`, or API keys.
-- Use meaningful commits when completing project stages.
-
-## AI assistance
-
-AI assistance was used during development. Review and understand the code, verify its behaviour, and disclose AI assistance in the AI-use log required by the project brief. Do not submit code you cannot explain.
+## Stage 12: animated scenes
+See STAGE12-CHANGES.txt. Each diagram is now an AI-directed animation (actors, movement, charts, counters) that follows what the lecturer says; the plain diagram is the automatic fallback.

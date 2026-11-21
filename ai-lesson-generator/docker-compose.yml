@@ -1,0 +1,12 @@
+services:
+  lessonforge:
+    build: .
+    ports: ["8000:8000"]
+    env_file: backend/.env
+    environment:
+      RENDER_BASE_URL: http://127.0.0.1:8000
+    volumes:
+      - lessonforge-data:/data
+    restart: unless-stopped
+volumes:
+  lessonforge-data:

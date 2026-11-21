@@ -1,0 +1,25 @@
+STAGE 12 - ANIMATED SCENES FOR EVERY LESSON
+===========================================
+Diagrams are no longer just labelled boxes. After the lesson is written, an AI "director" plans an
+animation for every teaching beat, for ANY topic: things appear, move, send tokens to each other,
+fill meters, count up numbers, draw charts, shift curves, tick/cross, pulse, shake.
+Every step fires on a phrase the lecturer says, so the picture moves exactly as it is explained.
+The same animations are recorded into the MP4 video.
+
+New / changed
+  backend/app/animation.py   vocabulary, validation, safe-SVG allowlist (no scripts, no handlers)
+  backend/app/director.py    per-section director prompt + add_animations (2 sections in parallel)
+  backend/app/services.py    build_lesson runs the director after review (progress 76-96%)
+  backend/app/qa.py          Ask-the-lecturer answers are animated too
+  backend/app/models.py      VisualScene.animation (invalid animations quietly become None)
+  frontend/src/AnimatedStage.jsx + board.css   the player (also used by the video renderer)
+  backend/tests/test_stage12.py                5 new tests (52 total pass)
+
+Honest limits
+  * Scenes are built from general pieces (boxes, tokens, charts, meters, small SVG drawings). They are
+    clean and clear but not hand-drawn bespoke illustrations. Maps, photos and 3D are not included.
+  * Quality depends on the AI model. If the director fails or returns junk for a beat, that beat simply
+    shows the normal diagram, so nothing breaks.
+  * Generation takes a little longer (one extra AI call per section).
+  * The director step was tested with a fake AI and the player with sample scenes (bank loan,
+    supply/demand chart, programming function); it has not been run against live Groq/Gemini here.

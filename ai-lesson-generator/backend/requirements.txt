@@ -1,8 +1,16 @@
 fastapi>=0.115,<1.0
 uvicorn[standard]>=0.30,<1.0
+python-multipart>=0.0.9          # file uploads
+groq>=0.11,<1.0
 google-genai>=1.0,<2.0
 tavily-python>=0.5,<1.0
 python-dotenv>=1.0,<2.0
 pydantic>=2.8,<3.0
 pytest>=8.0,<9.0
 httpx>=0.27,<1.0
+
+# ---- free extras (all optional; the app tells you what is missing) ----
+edge-tts>=6.1.9                  # natural neural voices + word timings, no API key
+pypdf>=4.0                       # teach from a PDF
+python-docx>=1.1                 # teach from a Word file
+playwright>=1.45                 # video export (then run: playwright install chromium)

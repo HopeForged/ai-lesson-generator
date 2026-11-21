@@ -1,0 +1,116 @@
+/* ---------- Human lecturer ---------- */
+.lecturer{--skin:#c68b64;--skin-shade:#b07650;--hair:#201a19;--jacket:#2e4468;--jacket-dark:#223652;--shirt:#f5f7fa;--tie:#a43d4c;
+  position:relative;display:flex;flex-direction:column;align-items:center;width:100%}
+.lecturer-svg{width:100%;max-width:340px;height:auto;overflow:visible;display:block}
+.lecturer .skin{fill:var(--skin)}
+.lecturer .skin-shade{fill:var(--skin-shade);opacity:.55}
+.lecturer .hair{fill:var(--hair)}
+.lecturer .hair-light{fill:none;stroke:#4a3d3a;stroke-width:3;stroke-linecap:round;opacity:.55}
+.lecturer .jacket{fill:var(--jacket)}
+.lecturer .shirt{fill:var(--shirt)}
+.lecturer .collar{fill:#e6ebf2}
+.lecturer .lapel{fill:var(--jacket-dark)}
+.lecturer .tie{fill:var(--tie)}
+.lecturer .pocket{stroke:var(--jacket-dark);stroke-width:3;stroke-linecap:round;fill:none}
+.lecturer .blush{fill:#d9776b;opacity:.16}
+.lecturer .brow{fill:none;stroke:var(--hair);stroke-width:3.6;stroke-linecap:round}
+.lecturer .eye-white{fill:#fff}
+.lecturer .iris{fill:#3b2a22}
+.lecturer .glint{fill:#fff}
+.lecturer .glasses rect,.lecturer .glasses path{fill:none;stroke:#2b2b36;stroke-width:2.2;stroke-linecap:round}
+.lecturer .glasses rect{fill:#bfe0ff;fill-opacity:.12}
+.lecturer .nose{fill:none;stroke:var(--skin-shade);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.lecturer .mouth-closed{fill:none;stroke:#7d3f3d;stroke-width:3;stroke-linecap:round}
+.lecturer .mouth-open{opacity:0;transform-box:fill-box;transform-origin:50% 0}
+.lecturer.mouth-driven .mouth-open{opacity:1;transform:scaleY(var(--mouth,0));transition:none}
+.lecturer.mouth-driven.is-speaking .mouth-open{animation:none}
+.lecturer.mouth-driven .mouth-closed{opacity:calc(1 - var(--mouth,0) * 4)}
+.lecturer .mouth-inner{fill:#53262b}
+.lecturer .teeth{fill:#fff}
+.lecturer .sleeve{stroke:#3a527b;stroke-width:40;stroke-linecap:round}
+.lecturer .cuff{stroke:var(--shirt);stroke-width:34}
+.lecturer .hand{fill:var(--skin)}
+.lecturer .thumb{fill:var(--skin)}
+.lecturer .finger{stroke:var(--skin);stroke-width:9;stroke-linecap:round;opacity:0;transition:opacity .25s}
+.lecturer .lectern-body{fill:#5a3f2f}
+.lecturer .lectern-top{fill:#7a5640}
+.lecturer .lectern-notes{fill:#f2f0e8}
+.lecturer .lectern-line{stroke:#a9a398;stroke-width:2;stroke-linecap:round}
+.lecturer .lectern-badge{fill:#8b78ff;opacity:.9}
+
+/* arms are posed with CSS transforms: upper arm around the shoulder, forearm around the elbow */
+.lecturer .arm,.lecturer .forearm,.lecturer .head,.lecturer .body-sway{transition:transform .55s cubic-bezier(.4,.1,.2,1)}
+.lecturer .arm-left{transform:rotate(3deg)}
+.lecturer .arm-right{transform:rotate(-3deg)}
+.lecturer .head{transform-origin:160px 172px}
+.lecturer .eyes{transform-box:fill-box;transform-origin:center;animation:lec-blink 5s infinite}
+@keyframes lec-blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.08)}}
+
+/* explain: both hands gesture in front of the chest */
+.lecturer.pose-explain .arm-left{transform:rotate(14deg)}
+.lecturer.pose-explain .arm-left .forearm{transform:rotate(196deg)}
+.lecturer.pose-explain .arm-right{transform:rotate(-14deg)}
+.lecturer.pose-explain .arm-right .forearm{transform:rotate(-196deg)}
+/* point: the arm nearest the board reaches toward it, the other hand stays lightly raised */
+.lecturer.pose-point .arm-left{transform:rotate(78deg)}
+.lecturer.pose-point .arm-left .forearm{transform:rotate(14deg)}
+.lecturer.pose-point .arm-left .finger{opacity:1}
+.lecturer.pose-point .arm-right{transform:rotate(-12deg)}
+.lecturer.pose-point .arm-right .forearm{transform:rotate(-200deg)}
+/* emphasize: one hand raised with a finger up */
+.lecturer.pose-emphasize .arm-right{transform:rotate(-26deg)}
+.lecturer.pose-emphasize .arm-right .forearm{transform:rotate(-168deg)}
+.lecturer.pose-emphasize .arm-right .finger{opacity:1}
+.lecturer.pose-emphasize .arm-left{transform:rotate(12deg)}
+.lecturer.pose-emphasize .arm-left .forearm{transform:rotate(200deg)}
+/* welcome: arms opened to the class */
+.lecturer.pose-welcome .arm-left{transform:rotate(38deg)}
+.lecturer.pose-welcome .arm-left .forearm{transform:rotate(148deg)}
+.lecturer.pose-welcome .arm-right{transform:rotate(-38deg)}
+.lecturer.pose-welcome .arm-right .forearm{transform:rotate(-148deg)}
+
+/* speaking */
+.lecturer.is-speaking .mouth-closed{opacity:0}
+.lecturer.is-speaking .mouth-open{opacity:1;animation:lec-talk .34s ease-in-out infinite alternate}
+.lecturer.is-speaking .mouth-open{animation-duration:.3s}
+.lecturer.is-speaking .head{animation:lec-nod 3.4s ease-in-out infinite}
+.lecturer.is-speaking .body-sway{animation:lec-breathe 3s ease-in-out infinite}
+.lecturer.is-speaking.pose-explain .arm-left .forearm{animation:lec-gesture-l 1.7s ease-in-out infinite alternate}
+.lecturer.is-speaking.pose-explain .arm-right .forearm{animation:lec-gesture-r 2.1s ease-in-out infinite alternate}
+.lecturer.is-speaking.pose-point .arm-left .forearm{animation:lec-point 1.2s ease-in-out infinite alternate}
+.lecturer.is-speaking.pose-welcome .arm-right .forearm{animation:lec-wave .7s ease-in-out infinite alternate}
+.lecturer.is-speaking.pose-emphasize .arm-right .forearm{animation:lec-chop 1s ease-in-out infinite alternate}
+.lecturer.is-paused .head,.lecturer.is-paused .mouth-open,.lecturer.is-paused .forearm,.lecturer.is-paused .body-sway{animation:none!important}
+@keyframes lec-talk{from{transform:scaleY(.25)}to{transform:scaleY(1)}}
+@keyframes lec-nod{0%,100%{transform:rotate(-1.2deg) translateY(0)}50%{transform:rotate(1.2deg) translateY(1.5px)}}
+@keyframes lec-breathe{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.5px)}}
+@keyframes lec-gesture-l{from{transform:rotate(188deg)}to{transform:rotate(206deg)}}
+@keyframes lec-gesture-r{from{transform:rotate(-206deg)}to{transform:rotate(-188deg)}}
+@keyframes lec-point{from{transform:rotate(8deg)}to{transform:rotate(22deg)}}
+@keyframes lec-wave{from{transform:rotate(-136deg)}to{transform:rotate(-162deg)}}
+@keyframes lec-chop{from{transform:rotate(-160deg)}to{transform:rotate(-176deg)}}
+
+.lecturer-caption{display:flex;align-items:center;gap:7px;margin-top:6px;font-size:11px;font-weight:600;color:#aebbd0;letter-spacing:.3px}
+.live-dot{width:7px;height:7px;border-radius:50%;background:#6b7a92}
+.is-speaking .live-dot{background:#58d6a2;box-shadow:0 0 9px #58d6a2;animation:lec-pulse 1.1s ease-in-out infinite}
+@keyframes lec-pulse{50%{opacity:.4}}
+@media(prefers-reduced-motion:reduce){.lecturer *{animation:none!important;transition:none!important}}
+
+/* ---------- lecturer looks ---------- */
+.lecturer .hair-back,.lecturer .hair-f{display:none}
+.lecturer .hair-back{fill:var(--hair)}
+.lecturer.look-mensah{--skin:#b9805a;--skin-shade:#a06a47;--hair:#1a1514;--jacket:#2e4468;--jacket-dark:#223652;--tie:#a43d4c}
+.lecturer.look-walker{--skin:#e3b08a;--skin-shade:#c99870;--hair:#6a4a30;--jacket:#4a5563;--jacket-dark:#363f4b;--tie:#2f8f8a}
+.lecturer.look-walker .glasses{display:none}
+.lecturer.look-walker .sleeve{stroke:#586373}
+.lecturer.look-naledi{--skin:#8d5a3d;--skin-shade:#764a31;--hair:#150f0e;--jacket:#7a2f4a;--jacket-dark:#5b2237;--tie:#e8c26a}
+.lecturer.look-naledi .sleeve{stroke:#8a3a57}
+.lecturer.look-naledi .hair-back,.lecturer.look-naledi .hair-f{display:inline}
+.lecturer.look-naledi .hair-m,.lecturer.look-naledi .hair-light{display:none}
+.lecturer.look-naledi .tie{fill:none}
+.lecturer.look-naledi .shirt{fill:#f6efe9}
+.lecturer.look-naledi .brow{stroke-width:2.6}
+.lecturer.look-naledi .mouth-closed{stroke:#8a2e45;stroke-width:3.4}
+.lecturer.look-naledi .mouth-inner{fill:#6b2036}
+.lecturer.look-naledi .blush{opacity:.22}
+.lecturer.look-naledi .glasses{display:none}

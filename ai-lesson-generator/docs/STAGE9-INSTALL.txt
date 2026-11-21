@@ -1,0 +1,33 @@
+STAGE 9 - HUMAN LECTURER AND BETTER TEACHING VISUALS
+
+This update is built on your Stage 8 Groq + Gemini failover project.
+It keeps the dual-provider backend and updates the teaching experience.
+
+WHAT CHANGED
+- Replaced the cartoon tutor with a more human-looking lecturer illustration in a professional blazer.
+- Added restrained speaking, pointing, emphasis and welcome gestures.
+- Reworked the teaching visual area into animated diagrams with connected stages, moving particles and a highlighted focus.
+- Added different photosynthesis illustration modes for light capture, inputs, chloroplasts, and outputs.
+- Improved the AI lesson instructions so new lessons use natural lecturer-style narration and explain what learners should look at in each illustration.
+- Improved QA instructions to check that narration and visual demonstrations work together.
+
+INSTALL
+1. Close the running frontend and backend.
+2. Make a backup copy of your current Stage 8 project folder.
+3. Extract this ZIP to a temporary folder.
+4. Copy the following files from the extracted folder into the matching locations in your existing project, replacing those files:
+   frontend/src/TutorAvatar.jsx
+   frontend/src/VisualScene.jsx
+   frontend/src/styles.css
+   backend/app/services.py
+5. Do NOT replace or delete your existing backend/.env, .git, backend/.venv, frontend/node_modules, or any local API keys.
+6. Start the backend as usual using backend/start_backend.bat.
+7. In a second terminal, open frontend and run: npm run dev
+8. Generate a NEW lesson to test the improved lecturer-style script and section-specific visuals.
+
+IMPORTANT
+- Existing saved lesson files keep their old narration and visual plans. Generate a new lesson to see the improved AI-generated teaching style.
+- The voice still uses the browser's SpeechSynthesis voice. The avatar and script are improved, but a genuinely natural studio-quality human voice would require a separate neural text-to-speech service.
+- These are animated, AI-planned/programmed illustrations, not generated MP4 video footage.
+- Run backend tests from the backend folder: .\\run_tests.bat
+- Check that .env is not staged before pushing to GitHub.

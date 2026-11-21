@@ -1,0 +1,29 @@
+STAGE 6 - QUALITY ASSURANCE AGENT
+
+WHAT THIS UPDATE DOES
+- Adds a separate Gemini-powered quality review after lesson generation.
+- Checks factual support against Tavily research, clarity, completeness, consistency, and narration/visual alignment.
+- If the first review does not pass, Gemini gets one opportunity to correct the lesson and the reviewer checks it again.
+- Adds a quality score and review status to the generated lesson.
+- Keeps older saved lesson files compatible.
+- Adds automated tests for the quality-review data model.
+
+INSTALL
+1. Back up your current project folder.
+2. Extract this ZIP.
+3. Copy the contents of the ai-lesson-generator folder into your existing project folder and allow files to be replaced.
+4. Do NOT replace or delete .env, .git, .venv, node_modules, or your local settings.
+
+TEST
+1. Open VS Code in your existing project.
+2. Open a terminal and run: cd backend
+3. Run: .\run_tests.bat
+4. Start the backend using your existing backend\start_backend.bat.
+5. In a second terminal, run: cd frontend then npm run dev.
+6. Generate a NEW lesson. Wait for the quality review to finish.
+7. Check the quality score shown beside the lesson section count.
+
+IMPORTANT
+- The quality review makes an additional Gemini API call. This may increase generation time and API usage.
+- A score is an AI assessment, not a guarantee that every fact is correct. Always review important educational content.
+- The review runs once, with at most one correction attempt.

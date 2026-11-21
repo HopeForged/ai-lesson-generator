@@ -1,0 +1,7 @@
+STAGE 11 - THE FULL STUDIO
+New: natural free voices (edge-tts) with word-exact highlighting and lip-sync, 3 lecturers, MP4 video export with captions,
+Ask-the-lecturer (typed or spoken), quizzes + final test + flashcards, SQLite library + share links, upload PDF/Word/text,
+14 languages + 4 levels, live generation progress, study notes / PDF, rate limiting, Docker.
+Backend files: app/config.py db.py jobs.py sources.py tts.py quiz.py qa.py beats.py video.py (new), main.py services.py models.py (changed).
+Frontend files: Home, LessonView, Quiz, AskPanel, StudyNotes, VideoPanel, RenderPage, usePlayer, api, lecturers, progress (new); App, TutorAvatar, VisualScene (changed).
+See README.md for setup.

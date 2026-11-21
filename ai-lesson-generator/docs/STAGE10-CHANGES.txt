@@ -1,0 +1,29 @@
+STAGE 10 - REAL LECTURER, BEAT-BY-BEAT TEACHING, NEW DIAGRAM ENGINE
+
+HOW TO INSTALL
+Replace your project files with this folder's (keep your backend/.env, .venv and node_modules).
+Changed/new files:
+  frontend/src/App.jsx, TutorAvatar.jsx, VisualScene.jsx, styles.css
+  frontend/src/lecturer.css, board.css, lectureUtils.js   (new)
+  backend/app/models.py, services.py, main.py, tests/test_models.py
+Then: backend -> uvicorn app.main:app --reload ; frontend -> npm install ; npm run dev
+Generate a NEW lesson (old saved lessons still open, with beats cut from their narration).
+
+WHAT CHANGED
+1. Lecturer: redrawn as a properly proportioned human (glasses, blazer, tie) standing at a lectern.
+   Real shoulder + elbow joints: explaining, pointing at the board, making a key point, welcoming.
+   Blinking, nodding, lip movement while speaking.
+2. Diagrams: new engine with 7 layouts (process, cycle, hub/structure/concept, network, comparison,
+   timeline, applications grid). Every section gets its own colour theme and its own diagrams.
+   Labels, short details and icons come from the AI. Nodes appear and glow when the lecturer says them,
+   arrows draw and carry moving dots.
+3. Teaching style: the AI now writes the lecture as BEATS (spoken text + diagram + gesture). Each beat starts
+   by pointing at the board and walks through the diagram labels in order ("As you can see on the board...").
+   The narration is built from the beats, so speech and picture can never drift apart.
+4. Player: speech is played beat by beat; the diagram changes exactly when the lecturer moves to the next beat.
+   Subtitle line, click-to-jump script, clickable diagram dots, auto-continue to the next section,
+   better default voice choice (prefers Natural/Neural/Google voices).
+5. Backend: tolerant validation (long lists trimmed, unknown gestures -> explain), updated QA prompts, 5 new tests.
+
+NOTE: the voice is still the browser's built-in text-to-speech. For a studio-quality voice you would need a
+neural TTS service.

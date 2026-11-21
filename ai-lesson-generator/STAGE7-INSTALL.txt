@@ -1,0 +1,30 @@
+STAGE 7 - SYNCHRONIZED AI TEACHING DEMONSTRATIONS
+
+WHAT THIS UPDATE DOES
+- Gemini now plans teaching moments linked to exact sentences in the narration.
+- Each moment includes a presenter action: explain, point left, point right, emphasize, or welcome.
+- As browser text-to-speech reaches each sentence, the matching animated demonstration becomes active and the tutor changes gesture.
+- Visuals are motion-graphic diagrams, not static bullet slides. Photosynthesis has a dedicated animated illustration showing sunlight, water and carbon dioxide entering the plant, and glucose and oxygen being produced.
+- Other topics use animated process, concept, comparison and connected-system diagrams based on the AI-generated visual labels.
+- Existing lesson sections, slides, quality review, save/load and older lesson files remain compatible.
+
+INSTALL
+1. Back up your current project folder.
+2. Extract this ZIP.
+3. Copy the contents of the extracted project folder into your existing project folder and allow files to be replaced.
+4. Do NOT replace or delete your local backend/.env, .git, .venv, or frontend/node_modules folders.
+
+TEST
+1. Open VS Code in your existing project.
+2. In the backend terminal, run: .\run_tests.bat
+3. Confirm all tests pass.
+4. Start the backend using your existing backend\start_backend.bat.
+5. In a second terminal, run: cd frontend then npm run dev.
+6. Generate a NEW lesson on Photosynthesis.
+7. Play a section. Watch the demonstration change as the narration reaches each linked sentence, and check that the tutor points or gestures at the same time.
+8. Generate another topic (for example, computer networks) to check the general animated diagrams.
+
+IMPORTANT
+- The new visuals are animated diagrams rendered in the browser from Gemini's scene plan. This stage does not create AI-generated MP4 videos or separate photorealistic image files.
+- Synchronization uses browser speech-synthesis word-boundary events when supported. Some browsers do not provide reliable word boundaries; the existing timing fallback estimates progress, so alignment may be less exact there.
+- Older saved lessons remain loadable, but only newly generated lessons contain the richer presenter-action instructions.

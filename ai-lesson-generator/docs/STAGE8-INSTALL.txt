@@ -1,0 +1,38 @@
+STAGE 8 - AUTOMATIC GROQ + GEMINI FAILOVER
+
+WHAT CHANGED
+- Groq is the default primary AI provider.
+- Gemini is the automatic backup.
+- If the primary provider hits a quota/rate limit, temporary outage, connection problem, authentication/configuration problem, or unusable response, the backend tries the other provider.
+- This applies to lesson generation, quality review, and lesson correction.
+- Tavily research, the frontend, synchronized visual scenes, and avatar are unchanged.
+
+SETUP
+1. Make a backup copy of your existing project folder.
+2. Extract this ZIP into a NEW folder first, then copy its project files into your existing project.
+3. Keep your existing backend/.env file. Do NOT replace it with .env.example.
+4. In backend/.env, make sure these entries exist:
+   GROQ_API_KEY=your_actual_groq_key
+   GROQ_MODEL=openai/gpt-oss-120b
+   GEMINI_API_KEY=your_actual_gemini_key
+   GEMINI_MODEL=gemini-2.5-flash
+   AI_PRIMARY_PROVIDER=groq
+   TAVILY_API_KEY=your_existing_tavily_key
+5. Save backend/.env. Do not share it or commit it to GitHub.
+6. Open the backend folder in VS Code terminal and install updated dependencies:
+   pip install -r requirements.txt
+7. Run the backend tests:
+   .\run_tests.bat
+8. Start the backend with your usual backend/start_backend.bat.
+9. In a second VS Code terminal, run the frontend:
+   cd frontend
+   npm run dev
+
+OPTIONAL
+- Set AI_PRIMARY_PROVIDER=gemini to make Gemini primary and Groq backup.
+- You can change either model ID to another model enabled in that provider account.
+
+NOTES
+- Both providers have independent usage limits. Failover does not make usage unlimited.
+- If both providers are unavailable, the app reports an error.
+- This version does not send API keys to the browser.
